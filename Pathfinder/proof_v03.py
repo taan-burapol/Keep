@@ -7,7 +7,7 @@ from heapq import heappop, heappush
 
 SIZE = 8
 OFFSET = 0
-DENS = 0.1
+DENS = 0.2
 
 
 class Space:
@@ -94,14 +94,27 @@ class Visualizer:
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
 
-        xs = [point[0] for point in self.path]
-        ys = [point[1] for point in self.path]
-        zs = [point[2] for point in self.path]
+        # xs = [point[0] for point in self.path]
+        # ys = [point[1] for point in self.path]
+        # zs = [point[2] for point in self.path]
+        #
+        # ax.plot(xs, ys, zs, marker='o', linestyle='-', color='b')
 
-        ax.plot(xs, ys, zs, marker='o', linestyle='-', color='b')
+        # Plot path as blue blocks
+        if path:
+            path_x, path_y, path_z = zip(*path)
+            for i in range(len(path_x)):
+                x, y, z = path_x[i], path_y[i], path_z[i]
+                # ax.bar3d(x - 0.25, y - 0.25, z - 0.25, 0.5, 0.5, 0.5, color='blue', alpha=0.7)
+                if i > 0:
+                    prev_x, prev_y, prev_z = path_x[i - 1], path_y[i - 1], path_z[i - 1]
+                    mid_x, mid_y, mid_z = (x + prev_x) / 2, (y + prev_y) / 2, (z + prev_z) / 2
+                    ax.bar3d([prev_x - 0.25, mid_x - 0.25, x - 0.25], [prev_y - 0.25, mid_y - 0.25, y - 0.25],
+                             [prev_z - 0.25, mid_z - 0.25, z - 0.25], 0.5, 0.5, 0.5, color='blue', alpha=0.7)
 
         for obstacle in self.space.obstacles:
-            ax.scatter(*obstacle, c='r', marker='x', s=100)
+            # ax.scatter(*obstacle, c='r', marker='x', s=100)
+            ax.bar3d(*np.subtract(obstacle, 0.5), 1, 1, 1, color='red', alpha=0.1)
 
         plt.show()
 
