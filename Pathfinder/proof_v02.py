@@ -2,8 +2,13 @@ import heapq
 import math
 import time
 import random
-
+import numpy as np
 import matplotlib.pyplot as plt
+# from mpl_toolkits.mplot3d import Axes3D
+
+SIZE = 8
+OFFSET = 0
+DENS = 0.1
 
 
 class Node:
@@ -28,7 +33,8 @@ class AStar3D:
         self.width = width
         self.height = height
         self.depth = depth
-        self.grid = [[[0 for _ in range(depth)] for _ in range(height)] for _ in range(width)]
+        # self.grid = [[[0 for _ in range(depth)] for _ in range(height)] for _ in range(width)]
+        self.grid = np.zeros((width, height, depth))
 
     def plot_3d_space(self, path=None):
         fig = plt.figure()
@@ -39,7 +45,7 @@ class AStar3D:
             for y in range(self.height):
                 for z in range(self.depth):
                     if self.grid[x][y][z] == 1:
-                        ax.bar3d(x - 0.5, y - 0.5, z - 0.5, 1, 1, 1, color='red', alpha=0.5)
+                        ax.bar3d(x - 0.5, y - 0.5, z - 0.5, 1, 1, 1, color='red', alpha=0.1)
 
         # Plot path as blue blocks
         if path:
@@ -137,8 +143,9 @@ def create_3d_space_with_obstacles():
         return self
 
     # Create a 5x5x5 3D space
-    space = AStar3D(8, 8, 8)
-    space = add_random_obstacles(space, density=0.1)
+    space = AStar3D(SIZE, SIZE, SIZE)
+    if DENS > 0:
+        space = add_random_obstacles(space, density=DENS)
 
     # Add obstacles to the grid
     # space.set_obstacle(1, 0, 0)
@@ -162,14 +169,18 @@ t = time.perf_counter()
 # Example usage
 space = create_3d_space_with_obstacles()
 
-start = (0, 0, 0)
-end = (7, 7, 7)
+start = (random.randint(0, OFFSET), random.randint(0, OFFSET), random.randint(0, OFFSET))
+end = (random.randint(SIZE-OFFSET, SIZE) - 1,
+       random.randint(SIZE-OFFSET, SIZE) - 1,
+       random.randint(SIZE-OFFSET, SIZE) - 1)
 path = find_shortest_path(space, *start, *end)
+print(f"Start :{start}, End :{end}")
 print(f"Elapsed time : {(time.perf_counter() - t) * 1e3} ms")
 if path:
-    print("Shortest path:")
+    # print("Shortest path:")
     # for point in path:
     #     print(point)
+
     # Plot the 3D space and the path
     space.plot_3d_space(path)
 else:
