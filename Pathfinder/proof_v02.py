@@ -4,11 +4,13 @@ import time
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
 # from mpl_toolkits.mplot3d import Axes3D
 
 SIZE = 8
 OFFSET = 0
-DENS = 0.1
+DENS = 0.5
 
 
 class Node:
@@ -37,6 +39,10 @@ class AStar3D:
         self.grid = np.zeros((width, height, depth))
 
     def plot_3d_space(self, path=None):
+        # fig = None
+        print(plt.get_fignums(), len(plt.get_fignums()))
+        if len(plt.get_fignums()) > 0:
+            plt.close()
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
@@ -68,11 +74,13 @@ class AStar3D:
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
 
-        ax.set_xlim(0, self.width - 1)
-        ax.set_ylim(0, self.height - 1)
-        ax.set_zlim(0, self.depth - 1)
+        ax.set_xlim(0, max([self.width, self.height, self.depth]) - 1)
+        ax.set_ylim(0, max([self.width, self.height, self.depth]) - 1)
+        ax.set_zlim(0, max([self.width, self.height, self.depth]) - 1)
 
-        plt.show()
+        plt.show(block=False)
+        plt.pause(3)
+        # plt.close()
 
     def set_obstacle(self, x, y, z):
         if self.is_valid(x, y, z):
@@ -131,21 +139,15 @@ class AStar3D:
         return None
 
 
-def create_3d_space_with_obstacles():
-    def add_random_obstacles(self, density):
-        num_obstacles = math.ceil(density * self.width * self.height * self.depth)
-        for _ in range(num_obstacles):
-            x, y, z = random.randint(0,
-                                     self.width - 1), random.randint(0,
-                                                                     self.height - 1), random.randint(0,
-                                                                                                      self.depth - 1)
-            self.set_obstacle(x, y, z)
-        return self
-
-    # Create a 5x5x5 3D space
-    space = AStar3D(SIZE, SIZE, SIZE)
-    if DENS > 0:
-        space = add_random_obstacles(space, density=DENS)
+def add_random_obstacles(self, density):
+    num_obstacles = math.ceil(density * self.width * self.height * self.depth)
+    for _ in range(num_obstacles):
+        x, y, z = random.randint(0,
+                                 self.width - 1), random.randint(0,
+                                                                 self.height - 1), random.randint(0,
+                                                                                                  self.depth - 1)
+        self.set_obstacle(x, y, z)
+    return self
 
     # Add obstacles to the grid
     # space.set_obstacle(1, 0, 0)
@@ -158,30 +160,31 @@ def create_3d_space_with_obstacles():
     # space.set_obstacle(3, 3, 0)
     # space.set_obstacle(3, 4, 0)
 
-    return space
-
 
 def find_shortest_path(space, start_x, start_y, start_z, end_x, end_y, end_z):
     return space.find_path(start_x, start_y, start_z, end_x, end_y, end_z)
 
 
-t = time.perf_counter()
-# Example usage
-space = create_3d_space_with_obstacles()
-
-start = (random.randint(0, OFFSET), random.randint(0, OFFSET), random.randint(0, OFFSET))
-end = (random.randint(SIZE-OFFSET, SIZE) - 1,
-       random.randint(SIZE-OFFSET, SIZE) - 1,
-       random.randint(SIZE-OFFSET, SIZE) - 1)
-path = find_shortest_path(space, *start, *end)
-print(f"Start :{start}, End :{end}")
-print(f"Elapsed time : {(time.perf_counter() - t) * 1e3} ms")
-if path:
-    # print("Shortest path:")
-    # for point in path:
-    #     print(point)
-
-    # Plot the 3D space and the path
-    space.plot_3d_space(path)
-else:
-    print("No path found.")
+# t = time.perf_counter()
+# # Example usage
+# # Create a 5x5x5 3D space
+# space = AStar3D(SIZE, SIZE, SIZE)
+# if DENS > 0:
+#     space = add_random_obstacles(space, density=DENS)
+#
+# start = (random.randint(0, OFFSET), random.randint(0, OFFSET), random.randint(0, OFFSET))
+# end = (random.randint(SIZE - OFFSET, SIZE) - 1,
+#        random.randint(SIZE - OFFSET, SIZE) - 1,
+#        random.randint(SIZE - OFFSET, SIZE) - 1)
+# path = find_shortest_path(space, *start, *end)
+# print(f"Start :{start}, End :{end}")
+# print(f"Elapsed time : {(time.perf_counter() - t) * 1e3} ms")
+# if path:
+#     # print("Shortest path:")
+#     # for point in path:
+#     #     print(point)
+#
+#     # Plot the 3D space and the path
+#     space.plot_3d_space(path)
+# else:
+#     print("No path found.")

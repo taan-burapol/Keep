@@ -1,18 +1,17 @@
-import time
-
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import time
 from heapq import heappop, heappush
 
 SIZE = 8
 OFFSET = 0
-DENS = 0.2
+DENS = 0.5
 
 
 class Space:
-    def __init__(self, size):
-        self.size = size
+    def __init__(self, width, height, depth):
+        self.size = (width, height, depth)
         self.obstacles = set()
 
     def is_valid(self, point):
@@ -90,9 +89,6 @@ class Visualizer:
     def plot_path(self):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.set_xlabel('X')
-        ax.set_ylabel('Y')
-        ax.set_zlabel('Z')
 
         # xs = [point[0] for point in self.path]
         # ys = [point[1] for point in self.path]
@@ -116,36 +112,44 @@ class Visualizer:
             # ax.scatter(*obstacle, c='r', marker='x', s=100)
             ax.bar3d(*np.subtract(obstacle, 0.5), 1, 1, 1, color='red', alpha=0.1)
 
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+
+        ax.set_xlim(0, max(space.size) - 1)
+        ax.set_ylim(0, max(space.size) - 1)
+        ax.set_zlim(0, max(space.size) - 1)
+
         plt.show()
 
 
-t = time.perf_counter()
-# Define the 3D space dimensions
-space_size = (SIZE, SIZE, SIZE)
-
-# Define the start and end points
-start = (random.randint(0, OFFSET), random.randint(0, OFFSET), random.randint(0, OFFSET))
-end = (random.randint(SIZE - OFFSET, SIZE) - 1,
-       random.randint(SIZE - OFFSET, SIZE) - 1,
-       random.randint(SIZE - OFFSET, SIZE) - 1)
-
-# Create the space and pathfinder objects
-space = Space(space_size)
-path_finder = PathFinder(space, start, end)
-
-# Generate obstacles randomly with density 0.1 (10%)
-space.generate_obstacles(0.1)
-
-# Call the pathfinding function
-path = path_finder.a_star_search()
-print(f"Start :{start}, End :{end}")
-print(f"Elapsed time : {(time.perf_counter() - t) * 1e3} ms")
-if path:
-    # print("Path found:")
-    # print(path)
-
-    # Create the visualizer object and plot the result
-    visualizer = Visualizer(space, path)
-    visualizer.plot_path()
-else:
-    print("No path found.")
+# t = time.perf_counter()
+# # Define the 3D space dimensions
+# # space_size = (SIZE, SIZE, SIZE)
+#
+# # Define the start and end points
+# start = (random.randint(0, OFFSET), random.randint(0, OFFSET), random.randint(0, OFFSET))
+# end = (random.randint(SIZE - OFFSET, SIZE) - 1,
+#        random.randint(SIZE*2 - OFFSET, SIZE*2) - 1,
+#        random.randint(SIZE - OFFSET, SIZE) - 1)
+#
+# # Create the space and pathfinder objects
+# space = Space(SIZE, SIZE*2, SIZE)
+# path_finder = PathFinder(space, start, end)
+#
+# # Generate obstacles randomly with density 0.1 (10%)
+# space.generate_obstacles(DENS)
+#
+# # Call the pathfinding function
+# path = path_finder.a_star_search()
+# print(f"Start :{start}, End :{end}")
+# print(f"Elapsed time : {(time.perf_counter() - t) * 1e3} ms")
+# if path:
+#     # print("Path found:")
+#     # print(path)
+#
+#     # Create the visualizer object and plot the result
+#     visualizer = Visualizer(space, path)
+#     visualizer.plot_path()
+# else:
+#     print("No path found.")
