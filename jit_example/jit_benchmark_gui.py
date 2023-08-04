@@ -13,7 +13,7 @@ def sum_of_squares_py(n):
 
 
 # Numba JIT-compiled function
-@nb.jit
+@nb.jit(nopython=True)
 def sum_of_squares_numba(n):
     result = 0
     for i in range(1, n + 1):
@@ -40,7 +40,8 @@ def benchmark_numba(n, progress_var):
 
 
 def run_benchmarks():
-    n = 1000
+    n = 5000
+    run_num = 5
 
     py_progress_var = tk.DoubleVar()
     py_progress_bar["variable"] = py_progress_var
@@ -50,8 +51,8 @@ def run_benchmarks():
     numba_progress_bar["variable"] = numba_progress_var
     numba_progress_var.set(0)
 
-    py_time = timeit.timeit(lambda: benchmark_py(n, py_progress_var), number=10)
-    numba_time = timeit.timeit(lambda: benchmark_numba(n, numba_progress_var), number=10)
+    py_time = timeit.timeit(lambda: benchmark_py(n, py_progress_var), number=run_num)
+    numba_time = timeit.timeit(lambda: benchmark_numba(n, numba_progress_var), number=run_num)
 
     result_label.config(text=f"Original Python: {py_time:.6f} sec\nNumba JIT: {numba_time:.6f} sec")
     py_progress_bar.stop()
