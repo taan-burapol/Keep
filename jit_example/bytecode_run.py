@@ -16,6 +16,7 @@ def sum_of_squares_py(n):
     return result
 
 
+# Benchmarking the original Python function
 def benchmark_py(n):
     return sum_of_squares_py(n)
 
