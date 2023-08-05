@@ -36,6 +36,7 @@ if bytecode:
     # Call the example_function from the executed code
     if 'example_function' in locals_dict:
         example_function = locals_dict['example_function']
-        example_function('Tim')  # Call example_function with argument 'Tim'
+        opt = example_function('Tim')  # Call example_function with argument 'Tim'
+        print(opt)
 else:
     print("Failed to read the compiled bytecode.")
