@@ -2,7 +2,7 @@ import os
 import sys
 import timeit
 
-# Replace 'script_to_run.py' with the path to the Python script you want to run
+# Python script for execute
 script_path = os.path.join(os.path.dirname(sys.argv[0]), "bytecode_jit_function.py")
 
 with open(script_path, 'r') as file:
