@@ -2,6 +2,7 @@ import os
 import csv
 import sys
 import timeit
+import marshal
 
 FILENAME = "numba_jit"
 
@@ -17,8 +18,8 @@ def write_csv_with_loop(iterations, filename):
     # Python script for execute
     script_path = os.path.join(os.path.dirname(sys.argv[0]), FILENAME + ".pyc")
 
-    with open(script_path, 'r') as script_file:
-        script_code = script_file.read()
+    with open(script_path, "rb") as pyc_file:
+        script_code = marshal.load(pyc_file)
     if script_code:
         # Define the globals and locals dictionaries with arguments
         globals_dict = {}
@@ -42,7 +43,7 @@ def write_csv_with_loop(iterations, filename):
 
 
 if __name__ == "__main__":
-    num_iterations = input("num_iterations :")  # Change this number to the desired number of iterations
-    csv_filename = FILENAME + '.csv'  # Change this to the desired filename
+    num_iterations = int(input("num_iterations :"))  # Change this number to the desired number of iterations
+    csv_filename = FILENAME + '_pyc' + '.csv'  # Change this to the desired filename
 
     write_csv_with_loop(num_iterations, csv_filename)
