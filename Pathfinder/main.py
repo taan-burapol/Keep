@@ -1,4 +1,6 @@
-import proof_v02
+import os
+import csv
+import main_core
 import time
 import random
 
@@ -8,7 +10,7 @@ class RandomNumberPairGenerator:
         self.previous_combinations = []
 
     def generate_random_pair(self):
-        valid_numbers = [(num1, num2) for num1 in range(8) for num2 in range(9)
+        valid_numbers = [(num1, num2) for num1 in range(16) for num2 in range(16)  # num2 -> n + 1
                          if (num1, num2) not in self.previous_combinations]
         if not valid_numbers:
             raise ValueError("All number pairs have been exhausted.")
@@ -18,16 +20,37 @@ class RandomNumberPairGenerator:
         return random_pair
 
 
+# CSV file path
+csv_file_path = 'data.csv'
+if os.path.exists(csv_file_path):
+    os.remove(csv_file_path)
+
+output_folder = 'plot'  # Name of the output folder
+
+# Remove existing files in the output folder
+if os.path.exists(output_folder):
+    for file in os.listdir(output_folder):
+        file_path = os.path.join(output_folder, file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+# Create the output folder if it doesn't exist
+os.makedirs(output_folder, exist_ok=True)
 obstacles = []
 rng_start = RandomNumberPairGenerator()
 rng_end = RandomNumberPairGenerator()
+
+width = 32
+height = 16
+depth = 16
+
 while True:
     t = time.perf_counter()
-    space = proof_v02.AStar3D(16, 8, 8)
+    space = main_core.AStar3D(width, height, depth)
     try:
 
         start = (0, *rng_start.generate_random_pair())
-        end = (15, *rng_end.generate_random_pair())
+        end = (width - 1, *rng_end.generate_random_pair())
     except ValueError:
         break
     if obstacles:
@@ -39,16 +62,20 @@ while True:
                 # print(obstacle, end)
                 continue
             space.set_obstacle(*obstacle)
-    path = proof_v02.find_shortest_path(space, *start, *end)
+    path = main_core.find_shortest_path(space, *start, *end)
     print(f"Elapsed time : {(time.perf_counter() - t) * 1e3} ms")
+    t = time.perf_counter()
+    # Append the new row to the CSV file
     if path:
-        # print("Shortest path:")
-        # for point in path:
-        #     print(point)
+        with open(csv_file_path, 'a', newline='') as csvfile:
+            csv_writer = csv.writer(csvfile)
+            csv_writer.writerow(path)
 
-        # Plot the 3D space and the path
-        space.plot_3d_space(path)
-        for obstacle in path:
-            obstacles.append(obstacle)
-    else:
-        print("No path found.")
+    # if path:
+    #     # Plot the 3D space and the path
+    #     space.plot_3d_space(path)
+    #     for obstacle in path:
+    #         obstacles.append(obstacle)
+    # else:
+    #     print("No path found.")
+    # print(f"{' ' * 40}\tPlot time : {(time.perf_counter() - t) * 1e3} ms")

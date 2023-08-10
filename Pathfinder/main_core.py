@@ -1,8 +1,12 @@
 import heapq
 import math
+import os
+import pickle
 import time
 import random
 import numpy as np
+import numba as nb
+from mayavi import mlab
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -11,6 +15,7 @@ from mpl_toolkits.mplot3d import Axes3D
 SIZE = 8
 OFFSET = 0
 DENS = 0.5
+output_folder = 'plot'
 
 
 class Node:
@@ -26,6 +31,7 @@ class Node:
         return self.g + self.h < other.g + other.h
 
 
+@nb.jit(forceobj=True)
 def calculate_heuristic(node, end):
     return abs(end.x - node.x) + abs(end.y - node.y) + abs(end.z - node.z)
 
@@ -40,7 +46,7 @@ class AStar3D:
 
     def plot_3d_space(self, path=None):
         # fig = None
-        print(plt.get_fignums(), len(plt.get_fignums()))
+        # print(plt.get_fignums(), len(plt.get_fignums()))
         if len(plt.get_fignums()) > 0:
             plt.close()
         fig = plt.figure()
@@ -65,11 +71,6 @@ class AStar3D:
                     ax.bar3d([prev_x - 0.25, mid_x - 0.25, x - 0.25], [prev_y - 0.25, mid_y - 0.25, y - 0.25],
                              [prev_z - 0.25, mid_z - 0.25, z - 0.25], 0.5, 0.5, 0.5, color='blue', alpha=0.7)
 
-        # # Plot path as a blue line
-        # if path:
-        #     path_x, path_y, path_z = zip(*path)
-        #     ax.plot(path_x, path_y, path_z, color='blue', marker='o')
-
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
@@ -77,10 +78,43 @@ class AStar3D:
         ax.set_xlim(0, max([self.width, self.height, self.depth]) - 1)
         ax.set_ylim(0, max([self.width, self.height, self.depth]) - 1)
         ax.set_zlim(0, max([self.width, self.height, self.depth]) - 1)
+        #
+        num_existing_files = len(os.listdir(output_folder))
+        filename = os.path.join(output_folder, f'figure_{num_existing_files:02d}.png')
+        plt.savefig(filename)
 
-        plt.show(block=False)
-        plt.pause(3)
-        # plt.close()
+        # # plt.show(block=False)
+        # # plt.pause(3)
+        # # plt.close()
+
+        # mlab.clf()  # Clear the current figure
+        # extent = [0, self.width - 1, 0, self.height - 1, 0, self.depth - 1]
+        #
+        # # Plot obstacles as red cubes
+        # for x in range(self.width):
+        #     for y in range(self.height):
+        #         for z in range(self.depth):
+        #             if self.grid[x][y][z] == 1:
+        #                 mlab.points3d(x, y, z, scale_factor=1, color=(1, 0, 0), opacity=0.1, mode='cube')
+        #
+        # # Plot path as blue blocks
+        # if path:
+        #     path_x, path_y, path_z = zip(*path)
+        #     for i in range(len(path_x)):
+        #         x, y, z = path_x[i], path_y[i], path_z[i]
+        #         if i > 0:
+        #             prev_x, prev_y, prev_z = path_x[i - 1], path_y[i - 1], path_z[i - 1]
+        #             mid_x, mid_y, mid_z = (x + prev_x) / 2, (y + prev_y) / 2, (z + prev_z) / 2
+        #             mlab.points3d([prev_x, mid_x, x], [prev_y, mid_y, y], [prev_z, mid_z, z],
+        #                           scale_factor=0.5, color=(0, 0, 1), opacity=0.7, mode='cube')
+        #
+        # mlab.axes(extent=extent, ranges=extent, xlabel='X', ylabel='Y', zlabel='Z')
+        # mlab.view(azimuth=45, elevation=45)
+        # # mlab.show()
+        # num_existing_files = len(os.listdir(output_folder))
+        # filename = os.path.join(output_folder, f'figure_{num_existing_files:02d}.png')
+        # mlab.savefig(filename, magnification=2)
+        # mlab.close()
 
     def set_obstacle(self, x, y, z):
         if self.is_valid(x, y, z):
@@ -89,6 +123,7 @@ class AStar3D:
     def is_valid(self, x, y, z):
         return 0 <= x < self.width and 0 <= y < self.height and 0 <= z < self.depth and self.grid[x][y][z] == 0
 
+    @nb.jit(forceobj=True)
     def get_neighbors(self, node):
         x, y, z = node.x, node.y, node.z
         neighbors = [
@@ -98,6 +133,7 @@ class AStar3D:
         ]
         return [neighbor for neighbor in neighbors if self.is_valid(*neighbor)]
 
+    @nb.jit(forceobj=True)
     def find_path(self, start_x, start_y, start_z, end_x, end_y, end_z):
         start_node = Node(start_x, start_y, start_z)
         end_node = Node(end_x, end_y, end_z)
