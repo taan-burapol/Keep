@@ -4,13 +4,17 @@ import main_core
 import time
 import random
 
+WIDTH = 64
+HEIGHT = 64
+DEPTH = 64
+
 
 class RandomNumberPairGenerator:
     def __init__(self):
         self.previous_combinations = []
 
     def generate_random_pair(self):
-        valid_numbers = [(num1, num2) for num1 in range(16) for num2 in range(16)  # num2 -> n + 1
+        valid_numbers = [(num1, num2) for num1 in range(HEIGHT) for num2 in range(DEPTH)  # num2 -> n + 1
                          if (num1, num2) not in self.previous_combinations]
         if not valid_numbers:
             raise ValueError("All number pairs have been exhausted.")
@@ -40,17 +44,13 @@ obstacles = []
 rng_start = RandomNumberPairGenerator()
 rng_end = RandomNumberPairGenerator()
 
-width = 32
-height = 16
-depth = 16
-
 while True:
     t = time.perf_counter()
-    space = main_core.AStar3D(width, height, depth)
+    space = main_core.AStar3D(WIDTH, HEIGHT, DEPTH)
     try:
 
         start = (0, *rng_start.generate_random_pair())
-        end = (width - 1, *rng_end.generate_random_pair())
+        end = (WIDTH - 1, *rng_end.generate_random_pair())
     except ValueError:
         break
     if obstacles:

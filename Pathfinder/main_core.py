@@ -41,7 +41,7 @@ class AStar3D:
         self.width = width
         self.height = height
         self.depth = depth
-        # self.grid = [[[0 for _ in range(depth)] for _ in range(height)] for _ in range(width)]
+        # self.grid = [[[0 for _ in range(DEPTH)] for _ in range(HEIGHT)] for _ in range(WIDTH)]
         self.grid = np.zeros((width, height, depth))
 
     def plot_3d_space(self, path=None):
@@ -88,12 +88,12 @@ class AStar3D:
         # # plt.close()
 
         # mlab.clf()  # Clear the current figure
-        # extent = [0, self.width - 1, 0, self.height - 1, 0, self.depth - 1]
+        # extent = [0, self.WIDTH - 1, 0, self.HEIGHT - 1, 0, self.DEPTH - 1]
         #
         # # Plot obstacles as red cubes
-        # for x in range(self.width):
-        #     for y in range(self.height):
-        #         for z in range(self.depth):
+        # for x in range(self.WIDTH):
+        #     for y in range(self.HEIGHT):
+        #         for z in range(self.DEPTH):
         #             if self.grid[x][y][z] == 1:
         #                 mlab.points3d(x, y, z, scale_factor=1, color=(1, 0, 0), opacity=0.1, mode='cube')
         #
@@ -176,12 +176,12 @@ class AStar3D:
 
 
 def add_random_obstacles(self, density):
-    num_obstacles = math.ceil(density * self.width * self.height * self.depth)
+    num_obstacles = math.ceil(density * self.WIDTH * self.HEIGHT * self.DEPTH)
     for _ in range(num_obstacles):
         x, y, z = random.randint(0,
-                                 self.width - 1), random.randint(0,
-                                                                 self.height - 1), random.randint(0,
-                                                                                                  self.depth - 1)
+                                 self.WIDTH - 1), random.randint(0,
+                                                                 self.HEIGHT - 1), random.randint(0,
+                                                                                                  self.DEPTH - 1)
         self.set_obstacle(x, y, z)
     return self
 
